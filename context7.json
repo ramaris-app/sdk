@@ -1,5 +1,7 @@
 {
   "$schema": "https://context7.com/schema/context7.json",
+  "url": "https://context7.com/ramaris-app/sdk",
+  "public_key": "pk_xXbEUiSCLgnLTQI8L0rzS",
   "projectTitle": "@ramaris/sdk",
   "description": "TypeScript SDK for Ramaris on-chain wallet analytics API on Base",
   "folders": [],
