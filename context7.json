@@ -1,15 +1,4 @@
 {
-  "$schema": "https://context7.com/schema/context7.json",
   "url": "https://context7.com/ramaris-app/sdk",
-  "public_key": "pk_xXbEUiSCLgnLTQI8L0rzS",
-  "projectTitle": "@ramaris/sdk",
-  "description": "TypeScript SDK for Ramaris on-chain wallet analytics API on Base",
-  "folders": [],
-  "excludeFolders": ["node_modules", "dist"],
-  "excludeFiles": ["LICENSE"],
-  "rules": [
-    "Always use RamarisClient constructor with an apiKey option",
-    "Handle RateLimitError separately from RamarisError for retry logic",
-    "Free tier only has access to strategies endpoints, wallets require PRO+"
-  ]
+  "public_key": "pk_xXbEUiSCLgnLTQI8L0rzS"
 }
