@@ -1,0 +1,251 @@
+# Ramaris
+
+> On-chain wallet analytics platform for Base. Track verified wallets, analyze trading performance, create strategies, and receive real-time notifications.
+
+Ramaris helps crypto traders discover profitable wallets, understand their trading patterns, and get notified when they make moves. The platform focuses on the Base blockchain and provides detailed PnL analytics, win rates, and trade history.
+
+## Core Concepts
+
+### Wallets
+Tracked blockchain wallets on Base. Each wallet has:
+- **Win Rate**: Percentage of profitable trades (0-1)
+- **Realized PnL**: Total profit/loss in USD from closed positions
+- **Open Positions**: Current holdings being tracked
+- **Tags**: User-assigned categories (e.g., "whale", "defi", "meme")
+
+### Strategies
+Collections of wallets curated by users. Strategies allow you to:
+- Group related wallets together
+- Track combined performance metrics
+- Receive notifications when any wallet in the strategy trades
+- Share with the community via a unique shareId
+
+### Subscriptions
+Access tiers that determine feature availability:
+- **FREE**: Basic access, 100 API requests/hour (strategies only)
+- **PRO**: Full wallet addresses, 1,000 API requests/hour
+- **ULTRA**: Priority support, 10,000 API requests/hour
+- **ENTERPRISE**: Custom limits, 100,000 API requests/hour
+
+## REST API
+
+Base URL: `https://www.ramaris.app/api/v1`
+
+### Authentication
+
+All API requests require a Bearer token. Include your API key in the Authorization header:
+
+```
+Authorization: Bearer rms_your_api_key_here
+```
+
+API keys can be created from the API Access page in your account settings at https://www.ramaris.app/api-access
+
+### Rate Limiting
+
+Rate limits vary by subscription tier:
+
+| Tier | Requests/Hour |
+|------|---------------|
+| FREE | 100 (strategies only) |
+| PRO | 1,000 |
+| ULTRA | 10,000 |
+| ENTERPRISE | 100,000 |
+
+Rate limit headers are included in all responses:
+- `X-RateLimit-Limit`: Maximum requests per hour
+- `X-RateLimit-Remaining`: Remaining requests in current window
+- `X-RateLimit-Reset`: Unix timestamp when the limit resets
+
+### Pagination
+
+List endpoints support pagination via query parameters:
+- `page`: Page number (default: 1)
+- `pageSize`: Items per page (default: 20, max: 100)
+
+Paginated responses include a `pagination` object:
+```json
+{
+  "pagination": {
+    "page": 1,
+    "pageSize": 20,
+    "totalItems": 156,
+    "totalPages": 8
+  }
+}
+```
+
+### Endpoints
+
+#### GET /strategies
+List trading strategies sorted by last activity.
+
+Query Parameters:
+- `page` (integer, default: 1): Page number
+- `pageSize` (integer, default: 20, max: 100): Items per page
+
+Response:
+```json
+{
+  "data": [
+    {
+      "id": 123,
+      "shareId": "abc123def",
+      "name": "DeFi Alpha Hunter",
+      "description": "Tracking top DeFi wallets on Base",
+      "roiPercent": 45.2,
+      "lastActivityAt": "2026-01-15T10:30:00Z",
+      "createdAt": "2025-06-01T08:00:00Z",
+      "creator": {
+        "nickname": "cryptowhale"
+      },
+      "stats": {
+        "walletsTracked": 5,
+        "totalSwaps": 847
+      }
+    }
+  ],
+  "pagination": { ... }
+}
+```
+
+#### GET /strategies/{shareId}
+Get detailed information about a specific strategy.
+
+Path Parameters:
+- `shareId` (string, required): The strategy's unique share ID
+
+Response includes additional fields:
+- `status`: ACTIVE, INACTIVE, or DELETED
+- `stats.totalNotifications`: Total notifications sent
+- `tags`: Array of strategy tags
+
+#### GET /me/strategies/copying
+List strategies you're following. Requires authentication.
+
+Response includes `copiedAt` field indicating when you started following.
+
+#### GET /wallets
+List tracked wallets sorted by realized PnL.
+
+Query Parameters:
+- `page` (integer, default: 1): Page number
+- `pageSize` (integer, default: 20, max: 100): Items per page
+
+Response:
+```json
+{
+  "data": [
+    {
+      "id": 456,
+      "winRate": 0.72,
+      "realizedPnL": 125000.50,
+      "createdAt": "2025-03-15T09:00:00Z",
+      "stats": {
+        "totalSwaps": 1234,
+        "openPositions": 8
+      },
+      "tags": ["whale", "defi"]
+    }
+  ],
+  "pagination": { ... }
+}
+```
+
+Note: Wallet addresses are only visible to PRO tier and above.
+
+#### GET /wallets/{id}
+Get detailed information about a specific wallet.
+
+Path Parameters:
+- `id` (integer, required): The wallet's numeric ID
+
+Response includes additional fields:
+- `status`: Wallet status
+- `stats.followers`: Number of users following this wallet
+- `topTokens`: Array of most profitable tokens traded
+
+#### GET /me/profile
+Get the authenticated user's profile information.
+
+Response:
+```json
+{
+  "data": {
+    "id": "user_abc123",
+    "nickname": "cryptotrader",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "createdAt": "2025-01-15T10:00:00Z",
+    "isFounder": false,
+    "stats": {
+      "strategiesCreated": 3,
+      "walletsFollowed": 12,
+      "strategiesFollowed": 5
+    }
+  }
+}
+```
+
+#### GET /me/subscription
+Get the authenticated user's subscription information.
+
+Response:
+```json
+{
+  "data": {
+    "tier": "PRO",
+    "status": "active",
+    "currentPeriodEnd": "2026-02-15T00:00:00Z",
+    "cancelAtPeriodEnd": false,
+    "isFounder": false,
+    "createdAt": "2025-01-15T10:00:00Z"
+  }
+}
+```
+
+#### GET /health
+API health check. Useful for monitoring.
+
+Response:
+```json
+{
+  "status": "ok",
+  "version": "v1",
+  "timestamp": "2026-01-15T10:30:00Z",
+  "user": "user_abc123",
+  "rateLimit": {
+    "limit": 1000,
+    "keyPrefix": "rms_abc1"
+  }
+}
+```
+
+### Error Responses
+
+All errors follow this format:
+```json
+{
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human-readable error message",
+    "retryAfter": 1800
+  }
+}
+```
+
+Common error codes:
+- `MISSING_AUTH`: Missing Authorization header
+- `INVALID_API_KEY`: Invalid or expired API key
+- `INSUFFICIENT_SCOPE`: API key lacks required permissions
+- `NOT_FOUND`: Resource not found
+- `RATE_LIMITED`: Rate limit exceeded (includes `retryAfter` in seconds)
+- `INTERNAL_ERROR`: Server error
+
+## Links
+
+- Website: https://www.ramaris.app
+- API Documentation: https://www.ramaris.app/api-docs
+- OpenAPI Spec: https://www.ramaris.app/api/v1/openapi.yaml
+- Pricing: https://www.ramaris.app/pricing
+- API Access: https://www.ramaris.app/api-access

@@ -1,0 +1,50 @@
+{
+  "name": "@ramaris/sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for the Ramaris REST API. Query on-chain wallet analytics, trading strategies, and performance data on Base.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
+  },
+  "keywords": [
+    "ramaris",
+    "base",
+    "blockchain",
+    "wallet",
+    "analytics",
+    "defi",
+    "sdk",
+    "on-chain",
+    "trading",
+    "strategies"
+  ],
+  "license": "MIT",
+  "homepage": "https://www.ramaris.app/api-docs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ramaris-app/sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ramaris-app/sdk/issues"
+  }
+}

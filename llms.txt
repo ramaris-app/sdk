@@ -1,0 +1,56 @@
+# Ramaris
+
+> Ramaris is a platform for discovering, tracking, and analyzing on-chain wallet activity on Base and other EVM blockchains.
+
+Ramaris helps users monitor smart money movements, create automated trading strategies, and receive real-time notifications when wallets they follow make trades.
+
+## Core Features
+
+- **Wallet Tracking**: Monitor any blockchain wallet's trading activity in real-time
+- **Strategy Creation**: Build custom monitoring rules with filters for transaction value, timing, and more
+- **Signal Notifications**: Get instant alerts via Telegram, email, or push notifications
+- **Leaderboard Discovery**: Find profitable wallets through win rate and PnL rankings
+- **Token Analytics**: View detailed token metrics, holder analysis, and price charts
+
+## Documentation
+
+- [Getting Started](/docs/getting-started/) - Core concepts and platform overview
+- [Create a Strategy](/docs/create-strategy/) - Build your first monitoring strategy
+- [Tags & Labels](/docs/tags/) - Organize wallets and strategies
+- [API Reference](/docs/api/) - REST API documentation
+
+## Education
+
+- [What is a DEX?](/docs/education/what-is-a-dex/) - Decentralized exchanges explained
+- [Non-Custodial Wallets](/docs/education/what-is-non-custodial-wallet/) - Self-custody and security
+- [Smart Contracts & Swaps](/docs/education/smart-contracts-and-token-swaps/) - How token swaps work
+- [Slippage & Liquidity](/docs/education/understanding-slippage-price-impact-liquidity/) - Trading mechanics
+- [Gas Fees](/docs/education/evaluating-gas-fees/) - Transaction costs explained
+- [Security Best Practices](/docs/education/security-best-practices/) - Protect your assets
+
+## Blog
+
+- [Blog Home](/blog/) - Latest posts on trading, analytics, and strategy
+- [What is Smart Money?](/blog/what-is-smart-money/) - Guide to on-chain intelligence
+- [Blog RSS Feed](/blog/rss.xml) - Subscribe to updates
+
+## Key Pages
+
+- [Browse Strategies](/browse/strategies) - Discover copy-trading strategies
+- [Browse Wallets](/browse/wallets) - Find profitable wallets to follow
+- [Browse Tokens](/browse/tokens) - Explore trending tokens on Base
+- [Pricing](/pricing) - Subscription plans and features
+
+## Technical Details
+
+- **Supported Chains**: Base (primary), with more EVM chains coming
+- **Data Sources**: On-chain data via Moralis, Alchemy; prices via DexPaprika
+- **API**: REST API with free tier (100 req/hr, strategies). Full access on Pro+
+- **Notifications**: Telegram, email, push notifications, webhooks
+
+## Contact
+
+- Website: https://www.ramaris.app
+- X: https://x.com/ramaris_app
+- Farcaster: https://warpcast.com/ramaris-app
+- Documentation: https://www.ramaris.app/docs/
