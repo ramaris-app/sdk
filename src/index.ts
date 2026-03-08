@@ -1,8 +1,12 @@
 export { RamarisClient } from './client.js';
 export { RamarisError, RateLimitError } from './errors.js';
 export type {
+  AggregateStats,
   ClientOptions,
   HealthStatus,
+  LeaderboardParams,
+  LeaderboardStrategy,
+  LeaderboardWallet,
   PaginatedResponse,
   Pagination,
   PaginationParams,
@@ -10,8 +14,13 @@ export type {
   StrategyDetail,
   StrategyListItem,
   Subscription,
+  TokenDetail,
+  TokenListItem,
+  TokenListParams,
   UserProfile,
+  WalletComputedFilter,
   WalletDetail,
   WalletListItem,
+  WalletListParams,
   WatchlistStrategy,
 } from './types.js';

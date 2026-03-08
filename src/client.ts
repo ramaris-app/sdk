@@ -1,16 +1,24 @@
 import { RamarisError, RateLimitError } from './errors.js';
 import type {
+  AggregateStats,
   ClientOptions,
   HealthStatus,
+  LeaderboardParams,
+  LeaderboardStrategy,
+  LeaderboardWallet,
   PaginatedResponse,
   PaginationParams,
   RateLimitInfo,
   StrategyDetail,
   StrategyListItem,
   Subscription,
+  TokenDetail,
+  TokenListItem,
+  TokenListParams,
   UserProfile,
   WalletDetail,
   WalletListItem,
+  WalletListParams,
   WatchlistStrategy,
 } from './types.js';
 
@@ -29,13 +37,24 @@ export class RamarisClient {
   };
 
   readonly wallets: {
-    list: (params?: PaginationParams) => Promise<PaginatedResponse<WalletListItem>>;
+    list: (params?: WalletListParams) => Promise<PaginatedResponse<WalletListItem>>;
     get: (id: number) => Promise<WalletDetail>;
   };
 
   readonly me: {
     profile: () => Promise<UserProfile>;
     subscription: () => Promise<Subscription>;
+  };
+
+  readonly leaderboard: {
+    topWallets: (params?: LeaderboardParams) => Promise<{ wallets: LeaderboardWallet[]; cachedAt: string }>;
+    topStrategies: (params?: LeaderboardParams) => Promise<{ strategies: LeaderboardStrategy[]; cachedAt: string }>;
+    stats: () => Promise<AggregateStats>;
+  };
+
+  readonly tokens: {
+    list: (params?: TokenListParams) => Promise<PaginatedResponse<TokenListItem>>;
+    get: (contractAddress: string) => Promise<TokenDetail>;
   };
 
   constructor(options: ClientOptions) {
@@ -50,13 +69,49 @@ export class RamarisClient {
     };
 
     this.wallets = {
-      list: (params) => this.getPaginated<WalletListItem>('/wallets', params),
+      list: (params) => {
+        const extra: Record<string, string> = {};
+        if (params?.computed && params.computed.length > 0) {
+          extra.computed = params.computed.join(',');
+        }
+        return this.getPaginated<WalletListItem>('/wallets', params, extra);
+      },
       get: (id) => this.getSingle<WalletDetail>(`/wallets/${id}`),
     };
 
     this.me = {
       profile: () => this.getSingle<UserProfile>('/me/profile'),
       subscription: () => this.getSingle<Subscription>('/me/subscription'),
+    };
+
+    this.leaderboard = {
+      topWallets: (params) => {
+        const extra: Record<string, string> = {};
+        if (params?.limit !== undefined) extra.limit = String(params.limit);
+        return this.getSingle<{ wallets: LeaderboardWallet[]; cachedAt: string }>(
+          '/leaderboard/wallets',
+          extra,
+        );
+      },
+      topStrategies: (params) => {
+        const extra: Record<string, string> = {};
+        if (params?.limit !== undefined) extra.limit = String(params.limit);
+        return this.getSingle<{ strategies: LeaderboardStrategy[]; cachedAt: string }>(
+          '/leaderboard/strategies',
+          extra,
+        );
+      },
+      stats: () => this.getSingle<AggregateStats>('/leaderboard/stats'),
+    };
+
+    this.tokens = {
+      list: (params) => {
+        const extra: Record<string, string> = {};
+        if (params?.search) extra.search = params.search;
+        if (params?.chain) extra.chain = params.chain;
+        return this.getPaginated<TokenListItem>('/tokens', params, extra);
+      },
+      get: (contractAddress) => this.getSingle<TokenDetail>(`/tokens/${contractAddress}`),
     };
   }
 
@@ -67,17 +122,22 @@ export class RamarisClient {
   private async getPaginated<T>(
     path: string,
     params?: PaginationParams,
+    extraQuery?: Record<string, string>,
   ): Promise<PaginatedResponse<T>> {
-    return this.request<PaginatedResponse<T>>(path, params);
+    return this.request<PaginatedResponse<T>>(path, params, extraQuery);
   }
 
-  private async getSingle<T>(path: string): Promise<T> {
-    const response = await this.request<{ data: T }>(path);
+  private async getSingle<T>(path: string, extraQuery?: Record<string, string>): Promise<T> {
+    const response = await this.request<{ data: T }>(path, undefined, extraQuery);
     return response.data;
   }
 
-  private async request<T>(path: string, params?: PaginationParams): Promise<T> {
-    const url = this.buildUrl(path, params);
+  private async request<T>(
+    path: string,
+    params?: PaginationParams,
+    extraQuery?: Record<string, string>,
+  ): Promise<T> {
+    const url = this.buildUrl(path, params, extraQuery);
 
     let response: Response;
     try {
@@ -105,13 +165,22 @@ export class RamarisClient {
     return (await response.json()) as T;
   }
 
-  private buildUrl(path: string, params?: PaginationParams): string {
+  private buildUrl(
+    path: string,
+    params?: PaginationParams,
+    extraQuery?: Record<string, string>,
+  ): string {
     const url = `${this.baseUrl}${path}`;
-    if (!params) return url;
+    if (!params && !extraQuery) return url;
 
     const searchParams = new URLSearchParams();
-    if (params.page !== undefined) searchParams.set('page', String(params.page));
-    if (params.pageSize !== undefined) searchParams.set('pageSize', String(params.pageSize));
+    if (params?.page !== undefined) searchParams.set('page', String(params.page));
+    if (params?.pageSize !== undefined) searchParams.set('pageSize', String(params.pageSize));
+    if (extraQuery) {
+      for (const [k, v] of Object.entries(extraQuery)) {
+        searchParams.set(k, v);
+      }
+    }
 
     const qs = searchParams.toString();
     return qs ? `${url}?${qs}` : url;
